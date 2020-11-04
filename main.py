@@ -1,4 +1,12 @@
+import copy
+import random
 
+
+EMPTY = 0
+BLACK = 1
+WHITE = 2
+
+### BOARD FUNCTIONS ###
 
 def GenerateBoard(n):
     output = []
@@ -11,8 +19,19 @@ def GenerateBoard(n):
 def GetValue(B, x, y):
     if (x < 0) or (y < 0): return None
     if (x >= len(B)): return None
-    if (y > len(B[x])): return None
+    if (y > len(B[y])): return None
     return B[y][x]
+
+def GetLegalMoves(B):
+    output = list()
+
+    for y in range(len(B)):
+        for x in range(len(B[y])):
+            value = GetValue(B, x, y)
+            if (value is not None) and (value != WHITE) and (value != BLACK):
+                output.append((x, y))
+
+    return output
 
 def GetTopNeighbors(B, x, y, clean_none_types = False):
     top_y = y - 1
@@ -129,12 +148,113 @@ def FindAllNeighbors(B, x, y):
 
     return output
 
+def PrintBoard(B):
+    width = len(B)
 
-new_board = GenerateBoard(4)
+    padding = "  "
 
-neighbors = FindAllNeighbors(new_board, 1, 2)
+    output = "\n"
+    for y in range(len(B)):
+        spacers = " " * (width - (y + 1))
+        
+        values = ""
+        for x in range(len(B[y])):
+            symbol = '0'
+            if (B[y][x] == BLACK):
+                symbol = "B"
+            elif (B[y][x] == WHITE):
+                symbol = "W"
+            values += str(symbol) + " "
 
-print(new_board)
-print(neighbors)
+        output += padding + (spacers + values.strip() + spacers) + "\n"
+    
+    print(output)
+    return
+
+
+
+### PLAYER FUNCTIONS ###
+
+def GetRandomMove(B):
+    legal_moves = GetLegalMoves(B)
+
+    print(legal_moves)
+
+    if (len(legal_moves) == 0):
+        return None
+
+    point = random.choice(legal_moves)
+
+    return point
+
+def PlayAsWhite(B):
+    new_B = copy.deepcopy(B)
+
+    point = GetRandomMove(B)
+
+    if (point is None):
+        print("pass!")
+        return new_B
+    print("W plays {}".format(point))
+
+    new_B[point[1]][point[0]] = WHITE
+
+    return new_B
+
+
+def PlayAsBlack(B):
+    new_B = copy.deepcopy(B)
+    
+    point = GetRandomMove(B)
+
+    if (point is None):
+        print("pass!")
+        return new_B
+    print("B plays {}".format(point))
+
+    new_B[point[1]][point[0]] = BLACK
+
+    return new_B
+
+def PlayMove(B, player_to_move):
+    board = None
+
+    if (player_to_move == WHITE):
+        board = PlayAsWhite(B)
+    elif (player_to_move == BLACK):
+        board = PlayAsBlack(B)
+
+    return board
+
+def StartGame():
+    board = GenerateBoard(4)
+
+    current_player = WHITE
+
+    moves = 0
+    while (moves <= 10):
+        if ((moves % 2) == 0):
+            current_player = WHITE
+        else:
+            current_player = BLACK
+
+        print("{} to move!".format(current_player))
+
+        PrintBoard(board)
+
+        new_board = PlayMove(board, current_player)
+        board = new_board
+
+        PrintBoard(board)
+        print(">>>")
+
+        moves += 1
+        
+
+    return
+
+
+StartGame()
+
 
 print("game solved")
