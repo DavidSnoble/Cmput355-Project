@@ -16,6 +16,103 @@ def GenerateBoard(n):
 
     return output
 
+def GetBoardEdges(B):
+    # Retrieves the edges of the board that 
+    # the player's pieces need to reach in a single segment.
+    #
+    # Output:
+    # [left_side_edge, right_side_edge, bottom_side_edge]
+    
+    B_length = len(B)
+
+    left_side_edge = [(0, i) for i in range(B_length)]
+    right_side_edge = [(i, i) for i in range(B_length)]
+    bottom_side_edge = [(i, B_length - 1) for i in range(B_length)]
+
+    return [left_side_edge, right_side_edge, bottom_side_edge]
+
+def GetPointsOnType(B, color):
+    # Retrieves the points based on color
+
+    output = []
+
+    for y in range(len(B)):
+        for x in range(len(B[y])):
+            if (B[y][x] == color):
+                output.append((x, y))
+    
+    return output
+
+def GetSegments(B, color):
+    # Get all the points of the current type (color)
+    c_pts = GetPointsOnType(B, color)
+    s_c_pts = set(c_pts)
+
+    output = []
+    while len(s_c_pts) > 0:
+        # Pop off the from the valid points to start creating the segment
+        start_pt = s_c_pts.pop()
+
+        # Initialize the stack and segment
+        stack = [start_pt]
+        segment = set([start_pt])
+
+        while len(stack) > 0:
+            # Get the current point that we will evaluate for the current segment
+            cur_pt = stack.pop()
+
+            # Get the neighbors of the current point and retrieve the points
+            # that are of the same color (points within s_c_pts)
+            neighbors = set(FindAllNeighbors(cur_pt[0], cur_pt[1], clean_none_types=True))
+            intersection = s_c_pts & (neighbors | set([cur_pt])) 
+
+            # Add the valid neighbors onto the stack for further evaluation
+            stack += list(intersection)
+            # Add the valid neighors ontop of the segment
+            segment = segment | intersection
+
+            # Remove the points of that color 
+            # (we have already processed them and don't need to deal with them anymore)
+            s_c_pts = s_c_pts - intersection
+        
+        # Add the segment list onto the output
+        output.append(segment)
+
+    return output
+
+def DetectGameEnd(B):
+    def IsWinner(B, color):
+        c_segments = GetSegments(B, color)
+        for segment in c_segments:
+            if (IsSegmentWin(segment)):
+                return True
+
+    def IsSegmentWin(segment):
+        if len(segment & s_l_edge) == 0:
+            return False
+        if len(segment & s_r_edge) == 0:
+            return False
+        if len(segment & s_b_edge) == 0:
+            return False
+        return True
+
+    l_edge, r_edge, b_edge = GetBoardEdges(B)
+    
+    s_l_edge = set(l_edge)
+    s_r_edge = set(r_edge)
+    s_b_edge = set(b_edge)
+
+    if (IsWinner(B, WHITE)):
+        return (True, WHITE)
+
+    if (IsWinner(B, BLACK)):
+        return (True, BLACK)
+        
+    if (len(GetLegalMoves(B)) == 0):
+        return (True, EMPTY)
+
+    return (False, EMPTY)
+
 def GetValue(B, x, y):
     if (x < 0) or (y < 0): return None
     if (x >= len(B)): return None
@@ -33,7 +130,7 @@ def GetLegalMoves(B):
 
     return output
 
-def GetTopNeighbors(B, x, y, clean_none_types = False):
+def GetTopNeighbors(x, y, clean_none_types = False):
     top_y = y - 1
     ### If the current point is at the top of the board ###
     if (top_y < 0):
@@ -70,7 +167,7 @@ def GetTopNeighbors(B, x, y, clean_none_types = False):
 
     return output
 
-def GetMidNeighbors(B, x, y, clean_none_types = False):
+def GetMidNeighbors(x, y, clean_none_types = False):
     mid_left_x = x - 1
     mid_left_pt = None
 
@@ -99,7 +196,7 @@ def GetMidNeighbors(B, x, y, clean_none_types = False):
 
     return output
 
-def GetBotNeighbors(B, x, y, clean_none_types = False):
+def GetBotNeighbors(x, y, clean_none_types = False):
     bot_y = y + 1
     ### If the current point is at the bot of the board ###
     if (bot_y < 0):
@@ -136,13 +233,10 @@ def GetBotNeighbors(B, x, y, clean_none_types = False):
 
     return output
 
-def FindAllNeighbors(B, x, y):
-    print(GetValue(B, x, y))
-    if (GetValue(B, x, y) is None): return None
-
-    top_neigbhors = GetTopNeighbors(B, x, y)
-    mid_neighbors = GetMidNeighbors(B, x, y)
-    bot_neighbors = GetBotNeighbors(B, x, y)
+def FindAllNeighbors(x, y, clean_none_types = False):
+    top_neigbhors = GetTopNeighbors(x, y, clean_none_types)
+    mid_neighbors = GetMidNeighbors(x, y, clean_none_types)
+    bot_neighbors = GetBotNeighbors(x, y, clean_none_types)
 
     output = top_neigbhors + mid_neighbors + bot_neighbors
 
@@ -178,7 +272,7 @@ def PrintBoard(B):
 def GetRandomMove(B):
     legal_moves = GetLegalMoves(B)
 
-    print(legal_moves)
+    print("legal moves: {}".format(legal_moves))
 
     if (len(legal_moves) == 0):
         return None
@@ -195,7 +289,7 @@ def PlayAsWhite(B):
     if (point is None):
         print("pass!")
         return new_B
-    print("W plays {}".format(point))
+    print("White plays {}".format(point))
 
     new_B[point[1]][point[0]] = WHITE
 
@@ -210,7 +304,7 @@ def PlayAsBlack(B):
     if (point is None):
         print("pass!")
         return new_B
-    print("B plays {}".format(point))
+    print("Black plays {}".format(point))
 
     new_B[point[1]][point[0]] = BLACK
 
@@ -226,19 +320,33 @@ def PlayMove(B, player_to_move):
 
     return board
 
+def ColorToText(color):
+    text = ""
+    if (color == WHITE):
+        text = "White"
+    elif (color == BLACK):
+        text = "Black"
+    else:
+        text = "Unknown"
+    return text
+
 def StartGame():
     board = GenerateBoard(4)
 
     current_player = WHITE
 
     moves = 0
-    while (moves <= 10):
+
+    game_end = False
+    winner = EMPTY
+
+    while not game_end:
         if ((moves % 2) == 0):
             current_player = WHITE
         else:
             current_player = BLACK
 
-        print("{} to move!".format(current_player))
+        print("{} to move!".format(ColorToText(current_player)))
 
         PrintBoard(board)
 
@@ -249,12 +357,35 @@ def StartGame():
         print(">>>")
 
         moves += 1
-        
+
+        (game_end, winner) = DetectGameEnd(board)
+
+    print("Game has ended!")
+    print("The winner is {}!".format(ColorToText(winner)))
 
     return
 
 
 StartGame()
 
+# b = GenerateBoard(4)
+
+# white_points = [(0, 1), (1, 1), (1, 3), (2, 3), (3, 3)]
+# for w in white_points:
+#     b[w[1]][w[0]] = WHITE
+
+# pts = GetPointsOnType(b, WHITE)
+
+# segments = GetSegments(b, WHITE)
+
+# print(b)
+# PrintBoard(b)
+# print()
+
+# for seg in segments:
+#     print(seg)
+
+# print()
+# print(DetectGameEnd(b))
 
 print("game solved")
