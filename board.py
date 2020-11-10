@@ -1,3 +1,5 @@
+import copy
+
 class BoardUtils:
     def GetSegments(points_colored):
         # Convert the list points of the current type (color) into a set
@@ -287,6 +289,25 @@ class Board:
         
         return output.rstrip()
 
+    def Clone(self):
+        b = Board(self.size)
+        
+        b.size = self.size
+        
+        b.board = copy.deepcopy(self.board)
+        
+        b.board_edges = copy.deepcopy(self.board_edges)
+        
+        b.legal_moves = copy.deepcopy(self.legal_moves)
+        
+        b.w_points = copy.deepcopy(self.w_points)
+        b.b_points = copy.deepcopy(self.b_points)
+
+        b.w_segments = copy.deepcopy(self.w_segments)
+        b.b_segments = copy.deepcopy(self.b_segments)
+
+        return b
+
     ### Private Methods ###
     def _IsWinner(self, color):
         c_segments = []
@@ -380,19 +401,30 @@ def TestBoardClass():
         print(s)
     print()
 
+    new_b = b.Clone()
+
     new_pts = [(1, 2)]
     # new_pts = [(0, 3), (3, 3)]
     for p in new_pts:    
-        b.ColorPoint(p, color)
+        new_b.ColorPoint(p, color)
 
     print(b)
+    print("vs")
+    print(new_b)
     # segments = b.GetSegments(color)
-    segments = b.w_segments
+    segments = new_b.w_segments
     # segments = b.b_segments
     for s in segments:
         print(s)
     print()
     
+    outcome = new_b.DetectGameEnd()
+
+    text = ""
+    if (outcome[0]): text = "Game End" 
+    else: text = "Game Ongoing"
+    print("{} {}".format(text, Board.Color2Text[outcome[1]]))
+
     outcome = b.DetectGameEnd()
 
     text = ""
