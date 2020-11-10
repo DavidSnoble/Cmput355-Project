@@ -104,6 +104,13 @@ class Prompt:
 
         return user_input
 
+    def DisplayGameOver(winner):
+        print()
+        print("Game over!")
+        print("The winner is {}! Congrats!".format(winner))
+        print()
+        return
+
 
 class Game:
     ### Built-in Class Methods ###
@@ -165,7 +172,7 @@ class Game:
             outcome = self.board.DetectGameEnd()
 
         winner = Board.Color2Text[outcome[1]]
-        self._DisplayGameOver(self.board, winner)
+        Prompt.DisplayGameOver(winner)
 
 
 if __name__ == "__main__":

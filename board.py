@@ -284,8 +284,10 @@ class Board:
             # (This is because the board is triangular).
             spacers = spacer * (length - (y + 1))
 
+            line_number = "{}: ".format(y)
+
             # Append the line into the output
-            output += padding + (spacers + values.strip() + spacers) + "\n"
+            output += line_number + padding + (spacers + values.strip() + spacers) + "\n"
         
         return output.rstrip()
 
