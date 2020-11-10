@@ -1,6 +1,6 @@
 import copy
 import random
-
+from board import Board
 
 EMPTY = 0
 BLACK = 1
@@ -330,6 +330,7 @@ def ColorToText(color):
         text = "Unknown"
     return text
 
+'''
 def StartGame():
     board = GenerateBoard(4)
 
@@ -364,7 +365,50 @@ def StartGame():
     print("The winner is {}!".format(ColorToText(winner)))
 
     return
+'''
 
+player = (Board.WHITE, Board.BLACK)
+
+def StartGame():
+    b = Board(4)
+
+    player_index = 0
+    moves = 0
+
+    outcome = (False, 0)
+
+    while outcome[0] == False:
+        player_index = moves % 2
+        cur_color = player[player_index]
+
+        color_txt = Board.Color2Text[cur_color]
+        print("{} to move!".format(color_txt))
+        print(b)
+        print("---")
+
+        pt = None
+        if (cur_color == Board.WHITE):
+            # Generate a legal move from the board
+            pt = random.choice(list(b.legal_moves))
+        if (cur_color == Board.BLACK):
+            # Generate a legal move from the board
+            pt = random.choice(list(b.legal_moves))
+        # Color the current point
+        b.ColorPoint(pt, cur_color)
+
+        print("{} plays {}!".format(color_txt, pt))
+        print(b)
+        print(">>>")
+
+        moves += 1
+
+        outcome = b.DetectGameEnd()
+
+    print("{} wins!".format(Board.Color2Text[outcome[1]]))
+
+    return
+
+    
 
 StartGame()
 
@@ -387,5 +431,3 @@ StartGame()
 
 # print()
 # print(DetectGameEnd(b))
-
-print("game solved")
