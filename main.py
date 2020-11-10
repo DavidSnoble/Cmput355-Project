@@ -2,8 +2,7 @@ import copy
 import random
 from board import Board
 from player import Player
-
-
+from game import Game
 
 w_player = Player(Board.WHITE)
 b_player = Player(Board.BLACK)
@@ -46,4 +45,7 @@ def StartGame():
 
     
 
-StartGame()
+# StartGame()
+
+game = Game(4)
+game.Start()
