@@ -1,6 +1,7 @@
 import copy
 import random
 from board import Board
+from player import Player
 
 EMPTY = 0
 BLACK = 1
@@ -367,7 +368,10 @@ def StartGame():
     return
 '''
 
-player = (Board.WHITE, Board.BLACK)
+w_player = Player(Board.WHITE)
+b_player = Player(Board.BLACK)
+
+player = (w_player, b_player)
 
 def StartGame():
     b = Board(4)
@@ -379,22 +383,17 @@ def StartGame():
 
     while outcome[0] == False:
         player_index = moves % 2
-        cur_color = player[player_index]
+        cur_player = player[player_index]
 
-        color_txt = Board.Color2Text[cur_color]
+        color_txt = Board.Color2Text[cur_player.color]
         print("{} to move!".format(color_txt))
         print(b)
         print("---")
 
-        pt = None
-        if (cur_color == Board.WHITE):
-            # Generate a legal move from the board
-            pt = random.choice(list(b.legal_moves))
-        if (cur_color == Board.BLACK):
-            # Generate a legal move from the board
-            pt = random.choice(list(b.legal_moves))
+        # Get the point that the current player is going to play
+        pt = cur_player.PlayMove(b)
         # Color the current point
-        b.ColorPoint(pt, cur_color)
+        b.ColorPoint(pt, cur_player.color)
 
         print("{} plays {}!".format(color_txt, pt))
         print(b)
