@@ -1,4 +1,6 @@
 import copy
+import agent
+import AStar
 
 class BoardUtils:
     def GetSegments(points_colored):
@@ -287,7 +289,9 @@ class Board:
             line_number = "{}: ".format(y)
 
             # Append the line into the output
-            output += line_number + padding + (spacers + values.strip() + spacers) + "\n"
+            #output += line_number + padding + (spacers + values.strip() + spacers) + "\n"
+            #output w/o line number
+            output += padding + (spacers + values.strip() + spacers) + "\n"
         
         return output.rstrip()
 
@@ -385,11 +389,14 @@ class Board:
 
 
 def TestBoardClass():
-    b = Board(4)
+    b = Board(18)
+    a = agent.Agent(b.WHITE)
     
     print(b)
     print()
+    print(str(a.PickStart(b)))
 
+    """
     pts = [(0, 1), (1, 1), (1, 3), (2, 3)] 
     color = b.WHITE
     for p in pts:
@@ -410,9 +417,13 @@ def TestBoardClass():
     for p in new_pts:    
         new_b.ColorPoint(p, color)
 
+    
     print(b)
     print("vs")
     print(new_b)
+    print()
+    print(str(a.PickStart(b)))
+
     # segments = b.GetSegments(color)
     segments = new_b.w_segments
     # segments = b.b_segments
@@ -420,7 +431,7 @@ def TestBoardClass():
         print(s)
     print()
     
-    outcome = new_b.DetectGameEnd()
+   # outcome = new_b.DetectGameEnd()
 
     text = ""
     if (outcome[0]): text = "Game End" 
@@ -433,7 +444,7 @@ def TestBoardClass():
     if (outcome[0]): text = "Game End" 
     else: text = "Game Ongoing"
     print("{} {}".format(text, Board.Color2Text[outcome[1]]))
-
+    """
     pass
 
 
