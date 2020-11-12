@@ -13,8 +13,8 @@ class AStar:
                 self.nodes[x][y].color = board.board[x][y]
                 self.nodes.pt = (x,y)
         '''
-        for i in range(board.size-1):
-            self.nodes.append([board.board[i][x] for x in range(i + 1)])
+        for i in range(board.size):
+            self.nodes.append([Node for x in range(i + 1)])
         
         
     
@@ -39,7 +39,7 @@ class AStar:
 
         
         startnode.h = self.GetClosestGoal(start, goals)
-        #print(startnode.h)
+        print(startnode.h)
         
         startnode.f = 0
 
@@ -47,30 +47,35 @@ class AStar:
         visited = []
         seen = []
 
-        #we're using negative G here to reverse the heap
+        #we're using negative G here to reverse the heap THIS IS A TUPLE 
+        #Because of the heap we must access the second element of the tuple
         heapq.heappush(frontier, (startnode.GetG(), startnode))
         seen.append(startnode)
         current = None
 
         while (current not in goals):
             current = frontier.pop()
-            print("current is below this")
-            print(current)
+            
             visited.append(current)
 
-            neighbors = board.GetNeighbors(current)
+            neighbors = board.GetNeighbors(current[1].pt)
+           
             for neighbor in neighbors:
-                neighbor_node = self.nodes[neighbor[0]][neighbor[1]]
+                x = neighbor[0]
+                y = neighbor[1]
+                
+                neighbor_node = self.nodes[y][x]
 
                 if neighbor_node not in seen:
                     neighbor_node.h = self.GetClosestGoal(neighbor, goals)
 
                     if (board.GetValue(neighbor) == color):
-                        neighbor_node.f = current.f
+                        neighbor_node.f = current[1].f
                     else:
-                        neighbor_node.f = current.f + 1
+                        print(neighbor_node.f)
+                        neighbor_node.f = current[1].f + 1
 
-                    neighbor_node.parent = current
+                    neighbor_node.parent = current[1]
 
                     seen.append(neighbor_node)
                     frontier.append(neighbor_node)
@@ -101,7 +106,7 @@ class AStar:
             if (current_dist < dist):
                 dist = current_dist
                 closest = goal
-        return closest
+        return dist
 
 
 class Node:
