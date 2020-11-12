@@ -5,16 +5,42 @@ class AStar:
     nodes = []
 
     def __init__(self, board):
-        for x in range(board.size):
-            for y in range(x):
+        '''
+        for y in range(board.size-1):
+            for x in range(y):
+                print("x is " + str(x))
+                print("y is " + str(y))
                 self.nodes[x][y].color = board.board[x][y]
                 self.nodes.pt = (x,y)
+        '''
+        for i in range(board.size-1):
+            self.nodes.append([board.board[i][x] for x in range(i + 1)])
+        
+        
+    
+                
 
 
 
-    def AStar(self, board, start, goals, color):
-        startnode = self.nodes[start[0]][start[1]]
+    def GetAStar(self, board, start, goals, color):
+        startnode = Node()
+        x = start[0]
+        y = start[1]
+
+        """       
+        print(x)
+        print(y)
+        print(self.nodes)
+        print(self.nodes[x][y-1])
+        """
+     
+        
+        startnode.pt = (x, y)
+
+        
         startnode.h = self.GetClosestGoal(start, goals)
+        #print(startnode.h)
+        
         startnode.f = 0
 
         frontier = []
@@ -22,12 +48,14 @@ class AStar:
         seen = []
 
         #we're using negative G here to reverse the heap
-        heapq.heappush(frontier, (-startnode.GetG, startnode))
+        heapq.heappush(frontier, (startnode.GetG(), startnode))
         seen.append(startnode)
         current = None
 
         while (current not in goals):
             current = frontier.pop()
+            print("current is below this")
+            print(current)
             visited.append(current)
 
             neighbors = board.GetNeighbors(current)
@@ -85,4 +113,5 @@ class Node:
     h = 0
 
     def GetG(self):
+        
         return self.f + self.h

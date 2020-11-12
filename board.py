@@ -389,7 +389,7 @@ class Board:
 
 
 def TestBoardClass():
-    b = Board(18)
+    b = Board(7)
     a = agent.Agent(b.WHITE)
     
     print(b)
