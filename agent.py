@@ -1,4 +1,4 @@
-import board
+from board import *
 import AStar
 
 class Agent:
@@ -28,6 +28,12 @@ class Agent:
         else:
             return (x, y+1)
 
+    def GetCommonNbrsBetweenPts(self, board, pt1, pt2):
+        pt1_neighbors = set(board.GetNeighbors(pt1))
+        pt2_neighbors = set(board.GetNeighbors(pt2))
+
+        return pt1_neighbors & pt2_neighbors
+
     def MovesFromPath(self, current, path, edge, board):
 
 
@@ -50,7 +56,9 @@ class Agent:
         second_index = 2
 
         # Common gets the pairs of neighbours in between two points
-        common = (board.GetNeighbours(path[first_index]).union(board.GetNeighbours(path[second_index])))
+        # common = (board.GetNeighbours(path[first_index]).union(board.GetNeighbours(path[second_index])))
+        # NOTE: THIS IS HENRY'S CHANGE: I HAVE MADE A NEW FUNCTION CALLED GET COMMON NEIGHBORS BETWEEN POINTS
+        common = self.GetCommonNbrsBetweenPts(board, path[first_index].pt, path[second_index].pt)
 
         # If there is only one neighbour between two points then increases the index's
         if(len(common) == 1):
@@ -59,8 +67,10 @@ class Agent:
 
         # While not at the end of the path add moves to list and pairs to list
         while(second_index < len(path)):
-            common = (board.GetNeighbours(path[first_index]).union(board.GetNeighbours(path[second_index])))
-            pairs.append(common)
+            # common = (board.GetNeighbours(path[first_index]).union(board.GetNeighbours(path[second_index])))
+            # NOTE: THIS IS HENRY'S CHANGE: I HAVE MADE A NEW FUNCTION CALLED GET COMMON NEIGHBORS BETWEEN POINTS
+            common = self.GetCommonNbrsBetweenPts(board, path[first_index].pt, path[second_index].pt)
+            pairs.append(list(common))
             
             moves.append(path[first_index])
 
