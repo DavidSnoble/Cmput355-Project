@@ -36,7 +36,6 @@ class AStar:
      
         startnode = Node((x,y))
         
-        
         startnode.h = self.GetClosestGoal(start, goals)
         
         startnode.f = 0
@@ -48,20 +47,17 @@ class AStar:
         #we're using negative G here to reverse the heap 
         # THIS IS A TUPLE 
         #Because of the heap we must access the second element of the tuple
-        heapq.heappush(frontier, (startnode.GetG(), startnode))
+        heapq.heappush(frontier, (-startnode.GetG(), startnode))
         seen.append(startnode)
-        current = None
+        cur_node = startnode
 
-        while (current not in goals):
-            current = frontier.pop()
-            
-            visited.append(current)
+        while (cur_node.pt not in goals):
+            cur_node = heapq.heappop(frontier)[1]
 
+            visited.append(cur_node)
 
-            neighbors = board.GetNeighbors(current[1].pt)
+            neighbors = board.GetNeighbors(cur_node.pt)
 
-
-           
             for neighbor in neighbors:
                 x = neighbor[0]
                 y = neighbor[1]
@@ -72,20 +68,18 @@ class AStar:
                     neighbor_node.h = self.GetClosestGoal(neighbor, goals)
 
                     if (board.GetValue(neighbor) == color):
-                        neighbor_node.f = current[1].f
+                        neighbor_node.f = cur_node.f
                     else:
-                        neighbor_node.f = current[1].f + 1
+                        neighbor_node.f = cur_node.f + 1
 
-                    neighbor_node.parent = current[1]
+                    neighbor_node.parent = cur_node
 
                     seen.append(neighbor_node)
 
                     #once again G is negative to reverse heap properties
-                    heap_element = (-neighbor_node.GetG(), neighbor_node)
+                    heapq.heappush(frontier, (-neighbor_node.GetG(), neighbor_node))
 
-                    heapq.heappush(frontier, heap_element)
-
-        return self.GetPath(current)
+        return self.GetPath(cur_node)
 
     def GetPath(self, lastnode):
         path = []
@@ -122,7 +116,7 @@ class Node:
         self.h = 0
 
     def __repr__(self):
-        return "Node: " + str(self.pt)
+        return "Node<{} : {}>".format(self.pt, self.GetG())
 
     def __gt__(self, rhs):
         return self.GetG() > rhs.GetG()
