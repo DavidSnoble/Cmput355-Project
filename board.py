@@ -135,7 +135,7 @@ class BoardUtils:
         x, y = pt
         bot_y = y + 1
         ### If the current point is at the bottom of the board ###
-        if (bot_y > n):
+        if (bot_y >= n):
             if clean_none_types: return []
             else: return [None, None]
         
