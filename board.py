@@ -389,12 +389,14 @@ class Board:
 
 
 def TestBoardClass():
-    b = Board(18)
+    b = Board(7)
     a = agent.Agent(b.WHITE)
     
     print(b)
     print()
-    print(str(a.PickStart(b)))
+    print(str(a.FirstTurn(b)))
+    a.PrintLists()
+    #print(str(a.PlayTurn))
 
     """
     pts = [(0, 1), (1, 1), (1, 3), (2, 3)] 

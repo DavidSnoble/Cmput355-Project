@@ -16,6 +16,7 @@ class Agent:
 
     def __init__(self,color):
         self.color = color
+        
 
     def PickStart(self, board):
         x = int(board.size / 4)
@@ -27,24 +28,83 @@ class Agent:
         else:
             return (x, y+1)
 
-    def MovesFromPath(self, path):
-        return [], []
+    def MovesFromPath(self, current, path, edge, board):
+
+
+        #Path is just the goal so return path and no pairs
+        if(len(path) == 1):
+            return path, []
+
+        #The Goal is one space away so add alternative goal
+        if(len(path) == 2):
+            common = (board.GetNeighbours(current).union(edge))
+            return path, common
+
+        #master_path = path
+
+        pairs = []
+        moves = []
+
+        
+        first_index = 0 
+        second_index = 2
+
+        # Common gets the pairs of neighbours in between two points
+        common = (board.GetNeighbours(path[first_index]).union(board.GetNeighbours(path[second_index])))
+
+        # If there is only one neighbour between two points then increases the index's
+        if(len(common) == 1):
+            first_index = first_index + 1
+            second_index = second_index + 1
+
+        # While not at the end of the path add moves to list and pairs to list
+        while(second_index < len(path)):
+            common = (board.GetNeighbours(path[first_index]).union(board.GetNeighbours(path[second_index])))
+            pairs.append(common)
+            
+            moves.append(path[first_index])
+
+            first_index = first_index + 2
+            second_index = second_index + 2
+
+        moves.append(path[first_index])
+
+        return moves, pairs
 
 
 
     def FirstTurn(self, board):
+        path_finder = AStar.AStar(board)
+
         start = self.PickStart(board)
 
-        edges = board.GetBoardEdges(board.size)
+        edges = board.board_edges
 
-        path_left = AStar.AStar(board, start, edges[0], self.color)
-        path_right = AStar.AStar(board, start, edges[1], self.color)
-        path_bottom = AStar.AStar(board, start, edges[2], self.color)
+        path_left = path_finder.GetAStar(board, start, edges[0], self.color)
+        path_right = path_finder.GetAStar(board, start, edges[1], self.color)
+        path_bottom = path_finder.GetAStar(board, start, edges[2], self.color)
 
-        self.moves_left, self.pairs_left = self.MovesFromPath(path_left)
-        self.moves_right, self.pairs_right = self.MovesFromPath(path_right)
-        self.moves_bottom, self.pairs_bottom = self.MovesFromPath(path_bottom)
+        
+        self.moves_left, self.pairs_left = self.MovesFromPath(start, path_left, edges[0], board)
+        self.moves_right, self.pairs_right = self.MovesFromPath(start, path_right, edges[1], board)
+        self.moves_bottom, self.pairs_bottom = self.MovesFromPath(start, path_bottom, edges[2], board)
+        
 
+        return start
+
+    def PrintLists(self):
+        #this is for debugging/ getting info
+        print("moves lists: (left, right, bottom")
+        print(self.moves_left)
+        print(self.moves_right)
+        print(self.moves_bottom)
+        print("pair lists:")
+        print(self.pairs_left)
+        print(self.pairs_right)
+        print(self.pairs_bottom)
+
+    
 
     def PlayTurn(self):
-        pass
+        
+        return self.moves_left.pop() 

@@ -1,4 +1,5 @@
 from board import Board
+from agent import Agent
 
 import random
 
@@ -34,7 +35,7 @@ class Player:
             score = 0.5
 
         return score
-
+    '''
     def minimax(self, curr_position, b, end_node_depth, maximizing_player):
         # tutorial from https://www.youtube.com/watch?v=l-hh51ncgDI&ab_channel=SebastianLague
 
@@ -49,7 +50,8 @@ class Player:
             #print(bottom)
 
             # calculate heuristic here
-            return heuristic
+            #return heuristic
+            return 0
 
         # get the list of legal moves after current move has been played
         legal_moves = list(b.legal_moves)
@@ -71,21 +73,33 @@ class Player:
                 cur_val = self.minimax(move, b, end_node_depth - 1, True)
                 minVal = min(minVal, val)
             return minVal
-
+'''
     ### Private Methods ###
 
 
 
 
 if __name__ == "__main__":
-    #b = Board(4)
+    b = Board(4)
 
-    #w_player = Player(b.WHITE)
-    #b_player = Player(b.BLACK)
-    #w_move = RandPlayerUtils.PlayMove(w_player, b)
-    #b_move = RandPlayerUtils.PlayMove(b_player, b)
-    #print(w_move)
-    #print(b_move)
+
+
+    w_player = Agent(b.WHITE)
+    b_player = Player(b.BLACK)
+
+
+    w_move = w_player.FirstTurn(b)
+    b_move = RandPlayerUtils.PlayMove(b_player, b)
+
+    while(self.Evaluate(b) == 0.5):
+        w_move = w_player.PlayTurn(b)
+        b_move = RandPlayerUtils.PlayMove(b_player, b)
+        
+
+    w_move = RandPlayerUtils.PlayMove(w_player, b)
+    b_move = RandPlayerUtils.PlayMove(b_player, b)
+    print(w_move)
+    print(b_move)
 
     #w_move = Player.minimax(w_player, w_move, b, 3, True)
     pass
