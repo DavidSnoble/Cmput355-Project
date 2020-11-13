@@ -3,7 +3,7 @@ import agent
 import AStar
 
 class BoardUtils:
-    def GetSegments(points_colored):
+    def GetSegments(points_colored, n):
         # Convert the list points of the current type (color) into a set
         s_c_pts = set(points_colored)
 
@@ -22,7 +22,7 @@ class BoardUtils:
 
                 # Get the neighbors of the current point and retrieve the points
                 # that are of the same color (points within s_c_pts)
-                neighbors = set(BoardUtils.GetNeighbors(cur_pt, clean_none_types=True))
+                neighbors = set(BoardUtils.GetNeighbors(cur_pt, n, clean_none_types=True))
                 intersection = s_c_pts & (neighbors | set([cur_pt])) 
 
                 # Add the valid neighbors onto the stack for further evaluation
@@ -52,10 +52,10 @@ class BoardUtils:
 
         return [set(left_side_edge), set(right_side_edge), set(bottom_side_edge)]
 
-    def GetNeighbors(pt, clean_none_types = False):
+    def GetNeighbors(pt, n, clean_none_types = False):
         top_neighbors = BoardUtils.GetTopNeighbors(pt, clean_none_types)
         mid_neighbors = BoardUtils.GetMidNeighbors(pt, clean_none_types)
-        bot_neighbors = BoardUtils.GetBotNeighbors(pt, clean_none_types)
+        bot_neighbors = BoardUtils.GetBotNeighbors(pt, n, clean_none_types)
 
         output = top_neighbors + mid_neighbors + bot_neighbors
         return output
@@ -131,12 +131,12 @@ class BoardUtils:
 
         return output
 
-    def GetBotNeighbors(pt, clean_none_types = False):
+    def GetBotNeighbors(pt, n, clean_none_types = False):
         x, y = pt
         bot_y = y + 1
         ### If the current point is at the bottom of the board ###
-        if (bot_y < 0):
-            if clean_none_types: return [] 
+        if (bot_y > n):
+            if clean_none_types: return []
             else: return [None, None]
         
         bot_left_x = x
@@ -259,7 +259,7 @@ class Board:
         return output
 
     def GetNeighbors(self, pt, clean_none_types = True):
-        return BoardUtils.GetNeighbors(pt, clean_none_types)
+        return BoardUtils.GetNeighbors(pt, self.size, clean_none_types)
 
     def GetSegments(self, color):
         # Get all the points of the current type (color)
