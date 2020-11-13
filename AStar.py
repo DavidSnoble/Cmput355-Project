@@ -60,12 +60,9 @@ class AStar:
 
             neighbors = board.GetNeighbors(current[1].pt)
 
+
            
             for neighbor in neighbors:
-                print(neighbor)
-                for y in range(len(self.nodes)):
-                    print("self.nodes at y:" + str(y))
-                    print(self.nodes[y])
                 x = neighbor[0]
                 y = neighbor[1]
                 
