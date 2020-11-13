@@ -84,13 +84,24 @@ class Agent:
         path_right = path_finder.GetAStar(board, start, edges[1], self.color)
         path_bottom = path_finder.GetAStar(board, start, edges[2], self.color)
 
-        """
+        
         self.moves_left, self.pairs_left = self.MovesFromPath(start, path_left, edges[0], board)
         self.moves_right, self.pairs_right = self.MovesFromPath(start, path_right, edges[1], board)
         self.moves_bottom, self.pairs_bottom = self.MovesFromPath(start, path_bottom, edges[2], board)
-        """ 
+        
 
         return start
+
+    def PrintLists(self):
+        #this is for debugging/ getting info
+        print("moves lists: (left, right, bottom")
+        print(self.moves_left)
+        print(self.moves_right)
+        print(self.moves_bottom)
+        print("pair lists:")
+        print(self.pairs_left)
+        print(self.pairs_right)
+        print(self.pairs_bottom)
 
     
 

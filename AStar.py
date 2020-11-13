@@ -14,7 +14,7 @@ class AStar:
                 self.nodes.pt = (x,y)
         '''
         for i in range(board.size):
-            self.nodes.append([Node for x in range(i + 1)])
+            self.nodes.append([Node((x,i)) for x in range(i + 1)])
         
         
     
@@ -23,7 +23,7 @@ class AStar:
 
 
     def GetAStar(self, board, start, goals, color):
-        startnode = Node()
+    
         x = start[0]
         y = start[1]
 
@@ -34,12 +34,10 @@ class AStar:
         print(self.nodes[x][y-1])
         """
      
+        startnode = Node((x,y))
         
-        startnode.pt = (x, y)
-
         
         startnode.h = self.GetClosestGoal(start, goals)
-        print(startnode.h)
         
         startnode.f = 0
 
@@ -47,7 +45,8 @@ class AStar:
         visited = []
         seen = []
 
-        #we're using negative G here to reverse the heap THIS IS A TUPLE 
+        #we're using negative G here to reverse the heap 
+        # THIS IS A TUPLE 
         #Because of the heap we must access the second element of the tuple
         heapq.heappush(frontier, (startnode.GetG(), startnode))
         seen.append(startnode)
@@ -58,9 +57,15 @@ class AStar:
             
             visited.append(current)
 
+
             neighbors = board.GetNeighbors(current[1].pt)
+
            
             for neighbor in neighbors:
+                print(neighbor)
+                for y in range(len(self.nodes)):
+                    print("self.nodes at y:" + str(y))
+                    print(self.nodes[y])
                 x = neighbor[0]
                 y = neighbor[1]
                 
@@ -72,13 +77,20 @@ class AStar:
                     if (board.GetValue(neighbor) == color):
                         neighbor_node.f = current[1].f
                     else:
-                        print(neighbor_node.f)
                         neighbor_node.f = current[1].f + 1
 
                     neighbor_node.parent = current[1]
 
                     seen.append(neighbor_node)
-                    frontier.append(neighbor_node)
+
+                    #once again G is negative to reverse heap properties
+                    heap_element = (-neighbor_node.GetG(), neighbor_node)
+                    print("heap element:")
+                    print(heap_element)
+
+                    heapq.heappush(frontier, heap_element)
+                    print("Frontier now looks like:")
+                    print(frontier)
 
         return self.GetPath(current)
 
@@ -110,12 +122,18 @@ class AStar:
 
 
 class Node:
-    pt = None
+    def __init__(self, pt):
+        self.pt = pt
+        self.parent = None
+        self.f = 0
+        self.h = 0
 
-    parent = None
+    def __repr__(self):
+        return "Node: " + str(self.pt)
 
-    f = 0
-    h = 0
+    def __gt__(self, rhs):
+        return self.GetG() > rhs.GetG()
+
 
     def GetG(self):
         
