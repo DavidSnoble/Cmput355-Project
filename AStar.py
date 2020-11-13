@@ -82,12 +82,8 @@ class AStar:
 
                     #once again G is negative to reverse heap properties
                     heap_element = (-neighbor_node.GetG(), neighbor_node)
-                    print("heap element:")
-                    print(heap_element)
 
                     heapq.heappush(frontier, heap_element)
-                    print("Frontier now looks like:")
-                    print(frontier)
 
         return self.GetPath(current)
 
