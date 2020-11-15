@@ -78,6 +78,8 @@ class AStar:
 
                     #once again G is negative to reverse heap properties
                     heapq.heappush(frontier, (-neighbor_node.GetG(), neighbor_node))
+                    print("")
+                    print("This is the heap" + str(frontier))
 
         return self.GetPath(cur_node)
 
@@ -89,12 +91,14 @@ class AStar:
             current = current.parent
         
         path.append(current)
+        print("This is the path")
+        print(path)
         return path
 
 
 
     def GetDist(self, p1, p2):
-        return (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2
+        return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
     def GetClosestGoal(self, start, goals):
         dist = float('inf')
@@ -105,6 +109,9 @@ class AStar:
             if (current_dist < dist):
                 dist = current_dist
                 closest = goal
+        
+        #print("The closest goal to start is ..." + str(start))
+        #print(closest)
         return dist
 
 

@@ -79,22 +79,22 @@ class Agent:
 
         moves.append(path[first_index])
 
-        if False:
-            ### DEBUG FUNCTION ###
-            print("DEBUG STATEMENT: BLACK represents MOVES, and WHITE represents PAIRS")
-            print()
-            board_clone = board.Clone()
-            
-            for move_node in moves:
-                pt = move_node.pt
-                board_clone.ColorPoint(pt, Board.BLACK)
-            
-            for pair_node in pairs:
-                for pt in pair_node:
-                    board_clone.ColorPoint(pt, Board.WHITE)
+        #if False:
+        ### DEBUG FUNCTION ###
+        print("DEBUG STATEMENT: BLACK represents MOVES, and WHITE represents PAIRS")
+        print()
+        board_clone = board.Clone()
+        
+        for move_node in moves:
+            pt = move_node.pt
+            board_clone.ColorPoint(pt, Board.BLACK)
+        
+        for pair_node in pairs:
+            for pt in pair_node:
+                board_clone.ColorPoint(pt, Board.WHITE)
 
-            print(board_clone)
-            print()
+        print(board_clone)
+        print()
 
         return moves, pairs
 
