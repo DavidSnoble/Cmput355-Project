@@ -393,7 +393,7 @@ class Board:
 
 
 def TestBoardClass():
-    b = Board(15)
+    b = Board(11)
     a = agent.Agent(b.WHITE)
     
     print(b)
@@ -410,7 +410,6 @@ def TestBoardClass():
     b.ColorPoint(turn,b.WHITE)
 
     while(turn != None):
-        print(turn)
         b.ColorPoint(turn, b.WHITE)
         turn = w_player.PlayTurn(b)
 

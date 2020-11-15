@@ -42,17 +42,13 @@ class Agent:
         return common_neighbors
 
     def MovesFromPath(self, current, path, edge, board):
-        #Path is just the goal so return path and possibly a pair(if applicable)
-        if(len(path) == 1):
-            common = [value for value in board.GetNeighbors(current) if value in edge]
-            if len(common) == 1:
-                common = []
-            return path, common
 
         pairs = []
         moves = []
 
         index = len(path) - 1
+        print("this is our starting index: {}".format(index))
+        print("our current path is {}".format(path))
 
         #check if the goal possibly has a pair in it
         second_tile_neighbors = set(board.GetNeighbors(path[index - 1].pt))
@@ -60,14 +56,18 @@ class Agent:
         common_goals = second_tile_neighbors & edge_set
         common_goals = list(common_goals)
         if (len(common_goals) == 2):
+            print("adding common goals {} to pairs".format(common_goals))
             pairs.append(common_goals)
+            index = index - 1
+            moves.append(path[index].pt)
+            index = index - 1
+        else:
+            moves.append(path[index])
+            index = index - 1
 
-            if index > 1:
-                index = index - 2
-            else:
-                moves.append(path[index - 1].pt)
 
 
+        '''
         while (index >= 1):
 
             #TEMP STATEMENT
@@ -80,48 +80,44 @@ class Agent:
             common_neighbors = self.GetCommonNbrsBetweenPts(board, path[index].pt, path[index - 2].pt)
             if len(common_neighbors) == 2:
                 if common_neighbors not in pairs:
+                    print("adding move {} to moves".format(path[index].pt))
                     moves.append(path[index].pt)
+                    print("adding pair {} to pairs".format(common_neighbors))
                     pairs.append(common_neighbors)
                     index = index - 2
+                    print("this is our next index: {}".format(index))
                     continue
 
             #check that we don't exist as a pair between the path
             common_neighbors = self.GetCommonNbrsBetweenPts(board, path[index + 1].pt, path[index - 1].pt)
             if len(common_neighbors) == 2:
                 if common_neighbors not in pairs:
+                    print("adding pair {} to pairs".format(common_neighbors))
                     pairs.append(common_neighbors)
                     index = index - 1
+                    print("this is our next index: {}".format(index))
 
             moves.append(path[index].pt)
         
         moves.append(path[0].pt)
-
-
-            
-                
-
-        #This does not work
         '''
-        # If there is only one neighbour between two points then increases the index's
-        if(len(common) == 1):
-            first_index = first_index + 1
-            second_index = second_index + 1
 
-        # While not at the end of the path add moves to list and pairs to list
-        while(second_index < len(path)):
-            # common = (board.GetNeighbours(path[first_index]).union(board.GetNeighbours(path[second_index])))
-            # NOTE: THIS IS HENRY'S CHANGE: I HAVE MADE A NEW FUNCTION CALLED GET COMMON NEIGHBORS BETWEEN POINTS
-            common = self.GetCommonNbrsBetweenPts(board, path[first_index].pt, path[second_index].pt)
-            print("common points between {} and {} are {}".format(path[first_index], path[second_index], common))
-            pairs.append(list(common))
-            
-            moves.append(path[first_index])
+        while (index >= 1):
+            print("index = {}".format(index))
+            #check if I'm a pair
+            common_neighbors = self.GetCommonNbrsBetweenPts(board, path[index + 1].pt, path[index - 1].pt)
+            if len(common_neighbors) == 2:
+                if common_neighbors not in pairs:
+                    print("adding pair {} to pairs".format(common_neighbors))
+                    pairs.append(common_neighbors)
+                    print("this is our next index: {}".format(index))
+                    index = index - 1
+                    continue
+            else:
+                moves.append(path[index].pt)
+            index = index - 1
+        moves.append(path[index])
 
-            first_index = first_index + 2
-            second_index = second_index + 2
-
-        moves.append(path[first_index])
-        '''
 
         if False:
         ### DEBUG FUNCTION ###
@@ -171,15 +167,16 @@ class Agent:
         print(self.moves_left)
         print(self.moves_right)
         print(self.moves_bottom)
+        print("")
         print("pair lists:")
         print(self.pairs_left)
         print(self.pairs_right)
         print(self.pairs_bottom)
+        print("")
 
     
 
     def PlayTurn(self, board):
-        print("called playturn")
         pairs = []
         pairs.append(self.pairs_left) 
         pairs.append(self.pairs_right) 
@@ -187,8 +184,6 @@ class Agent:
         pairs = list(pairs) 
 
         for pair in self.pairs_left:
-            print("pairs left:")
-            print(self.pairs_left)
 
             if board.GetValue(pair[0]) != Board.EMPTY:
                 self.pairs_left.remove(pair)
@@ -212,13 +207,15 @@ class Agent:
             pair = self.pairs_left.pop()
             return pair[0]
 
-        '''
+        
         if len(self.pairs_right) != 0:
-            return self.pairs_right.pop()[0]
+            pair = self.pairs_right.pop()
+            return pair[0]
 
         if len(self.pairs_bottom) != 0:
-            return self.pairs_bottom.pop()[0]
-        '''
+            pair = self.pairs_bottom.pop()
+            return pair[0]
+        
 
         return None
 
