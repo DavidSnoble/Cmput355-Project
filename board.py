@@ -2,6 +2,7 @@ import copy
 import agent
 import AStar
 
+
 class BoardUtils:
     def GetSegments(points_colored, n):
         # Convert the list points of the current type (color) into a set
@@ -314,6 +315,9 @@ class Board:
 
         return b
 
+    def IsWinner(self, color):
+        return self._IsWinner(color)
+
     ### Private Methods ###
     def _IsWinner(self, color):
         c_segments = []
@@ -389,14 +393,24 @@ class Board:
 
 
 def TestBoardClass():
-    b = Board(7)
+    b = Board(9)
     a = agent.Agent(b.WHITE)
     
     print(b)
     print()
     print(str(a.FirstTurn(b)))
     a.PrintLists()
-    #print(str(a.PlayTurn))
+    
+    w_player = agent.Agent(b.WHITE)
+
+
+
+    w_move = w_player.FirstTurn(b)
+
+    
+    while(not b.IsWinner(Board.WHITE)):
+        w_move = w_player.PlayTurn(b)
+        
 
     """
     pts = [(0, 1), (1, 1), (1, 3), (2, 3)] 

@@ -1,5 +1,6 @@
 from board import *
 import AStar
+#import board
 
 class Agent:
     color = "EMPTY"
@@ -32,7 +33,7 @@ class Agent:
         pt1_neighbors = set(board.GetNeighbors(pt1))
         pt2_neighbors = set(board.GetNeighbors(pt2))
 
-        return pt1_neighbors & pt2_neighbors
+        return list(pt1_neighbors & pt2_neighbors)
 
     def MovesFromPath(self, current, path, edge, board):
 
@@ -43,7 +44,11 @@ class Agent:
 
         #The Goal is one space away so add alternative goal
         if(len(path) == 2):
-            common = (board.GetNeighbours(current).union(edge))
+            #common = (board.GetNeighbors(current).union(edge))
+            common = (set(board.GetNeighbors(current)) & set(edge))
+            common = list(common)
+            if(common.len() == 1): 
+                common = []
             return path, common
 
         #master_path = path
@@ -79,22 +84,22 @@ class Agent:
 
         moves.append(path[first_index])
 
-        #if False:
+        if False:
         ### DEBUG FUNCTION ###
-        print("DEBUG STATEMENT: BLACK represents MOVES, and WHITE represents PAIRS")
-        print()
-        board_clone = board.Clone()
-        
-        for move_node in moves:
-            pt = move_node.pt
-            board_clone.ColorPoint(pt, Board.BLACK)
-        
-        for pair_node in pairs:
-            for pt in pair_node:
-                board_clone.ColorPoint(pt, Board.WHITE)
+            print("DEBUG STATEMENT: BLACK represents MOVES, and WHITE represents PAIRS")
+            print()
+            board_clone = board.Clone()
+            
+            for move_node in moves:
+                pt = move_node.pt
+                board_clone.ColorPoint(pt, Board.BLACK)
+            
+            for pair_node in pairs:
+                for pt in pair_node:
+                    board_clone.ColorPoint(pt, Board.WHITE)
 
-        print(board_clone)
-        print()
+            print(board_clone)
+            print()
 
         return moves, pairs
 
@@ -132,6 +137,39 @@ class Agent:
 
     
 
-    def PlayTurn(self):
+    def PlayTurn(self, board):
+        pairs = []
+        pairs.append(self.pairs_left) 
+        pairs.append(self.pairs_right) 
+        pairs.append(self.pairs_bottom)
+        pairs = list(pairs) 
+
+        for pair in self.pairs_left:
+            print(self.pairs_left)
+
+            if board.GetValue(pair[0]) != Board.EMPTY:
+                self.pairs_left.remove
+                return pair[1]
+            elif board.GetValue(pair[1]) != Board.EMPTY:
+                return pair[0]
+
         
-        return self.moves_left.pop() 
+        if len(self.moves_left) != 0:
+            return self.moves_left.pop()
+
+        if len(self.moves_right) != 0:
+            return self.moves_right.pop()
+
+        if len(self.moves_bottom) != 0:
+            return self.moves_bottom.pop()
+
+        
+        if len(self.pairs_left) != 0:
+            return self.pairs_left.pop()[0]
+
+        if len(self.pairs_right) != 0:
+            return self.pairs_right.pop()[0]
+
+        if len(self.pairs_bottom) != 0:
+            return self.pairs_bottom.pop()[0]
+
