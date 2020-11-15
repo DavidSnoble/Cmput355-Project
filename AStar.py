@@ -93,9 +93,7 @@ class AStar:
             path.append(current)
             current = current.parent
         
-        path.append(current)
-        print("This is the path")
-        print(path)
+        print("Path: {}".format(path))
         return path
 
 

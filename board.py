@@ -393,7 +393,7 @@ class Board:
 
 
 def TestBoardClass():
-    b = Board(9)
+    b = Board(15)
     a = agent.Agent(b.WHITE)
     
     print(b)
@@ -405,11 +405,18 @@ def TestBoardClass():
 
 
 
-    w_move = w_player.FirstTurn(b)
+    turn = w_player.FirstTurn(b)
+    print("first turn is {}".format(turn))
+    b.ColorPoint(turn,b.WHITE)
 
-    
-    while(not b.IsWinner(Board.WHITE)):
-        w_move = w_player.PlayTurn(b)
+    while(turn != None):
+        print(turn)
+        b.ColorPoint(turn, b.WHITE)
+        turn = w_player.PlayTurn(b)
+
+    print("this is what we played")
+    print(b)
+
         
 
     """
