@@ -89,17 +89,17 @@ if __name__ == "__main__":
 
 
     w_move = w_player.FirstTurn(b)
-    b_move = RandPlayerUtils.PlayMove(b_player, b)
+    #b_move = RandPlayerUtils.PlayMove(b_player, b)
 
     while(self.Evaluate(b) == 0.5):
         w_move = w_player.PlayTurn(b)
-        b_move = RandPlayerUtils.PlayMove(b_player, b)
+        #b_move = RandPlayerUtils.PlayMove(b_player, b)
         
 
-    w_move = RandPlayerUtils.PlayMove(w_player, b)
-    b_move = RandPlayerUtils.PlayMove(b_player, b)
-    print(w_move)
-    print(b_move)
+    #w_move = RandPlayerUtils.PlayMove(w_player, b)
+    #b_move = RandPlayerUtils.PlayMove(b_player, b)
+    #print(w_move)
+    #print(b_move)
 
-    #w_move = Player.minimax(w_player, w_move, b, 3, True)
+    
     pass

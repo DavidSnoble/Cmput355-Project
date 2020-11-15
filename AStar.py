@@ -1,6 +1,6 @@
 import board
 import heapq
-
+from queue import PriorityQueue
 class AStar:
     nodes = []
 
@@ -40,19 +40,21 @@ class AStar:
         
         startnode.f = 0
 
-        frontier = []
+        frontier = PriorityQueue()
         visited = []
         seen = []
 
         #we're using negative G here to reverse the heap 
         # THIS IS A TUPLE 
         #Because of the heap we must access the second element of the tuple
-        heapq.heappush(frontier, (-startnode.GetG(), startnode))
+        #heapq.heappush(frontier, (-startnode.GetG(), startnode))
+        frontier.put(startnode)
         seen.append(startnode)
         cur_node = startnode
 
         while (cur_node.pt not in goals):
-            cur_node = heapq.heappop(frontier)[1]
+            #cur_node = heapq.heappop(frontier)[1]
+            cur_node = frontier.get()
 
             visited.append(cur_node)
 
@@ -77,9 +79,10 @@ class AStar:
                     seen.append(neighbor_node)
 
                     #once again G is negative to reverse heap properties
-                    heapq.heappush(frontier, (-neighbor_node.GetG(), neighbor_node))
-                    print("")
-                    print("This is the heap" + str(frontier))
+                    #heapq.heappush(frontier, (-neighbor_node.GetG(), neighbor_node))
+                    frontier.put(neighbor_node)
+                    #print("")
+                    #print("This is the heap" + str(frontier))
 
         return self.GetPath(cur_node)
 
@@ -90,9 +93,7 @@ class AStar:
             path.append(current)
             current = current.parent
         
-        path.append(current)
-        print("This is the path")
-        print(path)
+        print("Path: {}".format(path))
         return path
 
 
