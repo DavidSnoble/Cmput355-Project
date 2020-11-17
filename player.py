@@ -1,5 +1,5 @@
-from board import Board
-from agent import Agent
+import board
+#from agent import Agent
 
 import random
 
@@ -94,12 +94,12 @@ if __name__ == "__main__":
     while(self.Evaluate(b) == 0.5):
         w_move = w_player.PlayTurn(b)
         #b_move = RandPlayerUtils.PlayMove(b_player, b)
-        
+
 
     #w_move = RandPlayerUtils.PlayMove(w_player, b)
     #b_move = RandPlayerUtils.PlayMove(b_player, b)
     #print(w_move)
     #print(b_move)
 
-    
+
     pass

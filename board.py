@@ -1,6 +1,7 @@
 import copy
 import agent
 import AStar
+import player
 
 
 class BoardUtils:
@@ -24,24 +25,24 @@ class BoardUtils:
                 # Get the neighbors of the current point and retrieve the points
                 # that are of the same color (points within s_c_pts)
                 neighbors = set(BoardUtils.GetNeighbors(cur_pt, n, clean_none_types=True))
-                intersection = s_c_pts & (neighbors | set([cur_pt])) 
+                intersection = s_c_pts & (neighbors | set([cur_pt]))
 
                 # Add the valid neighbors onto the stack for further evaluation
                 stack += list(intersection)
                 # Add the valid neighors ontop of the segment
                 segment = segment | intersection
 
-                # Remove the points of that color 
+                # Remove the points of that color
                 # (we have already processed them and don't need to deal with them anymore)
                 s_c_pts = s_c_pts - intersection
-            
+
             # Add the segment list onto the output
             output.append(segment)
 
         return output
 
     def GetBoardEdges(board_size):
-        # Retrieves the edges of the board that 
+        # Retrieves the edges of the board that
         # the player's pieces need to reach in a single segment.
         #
         # Output:
@@ -139,7 +140,7 @@ class BoardUtils:
         if (bot_y >= n):
             if clean_none_types: return []
             else: return [None, None]
-        
+
         bot_left_x = x
         bot_left_pt = None
 
@@ -157,7 +158,7 @@ class BoardUtils:
         if not (bot_right_x > bot_y): bot_right_pt = (bot_right_x, bot_y)
 
         output = []
-        
+
         if clean_none_types:
             # Append the points IF it isn't None
             if (bot_left_pt is not None):
@@ -182,7 +183,7 @@ class Board:
 
         # A list of lists that is shaped like a triangle.
         self.board = self._GenerateBoard(n)
-        
+
         # A list of the set of points that is the edge of the board.
         # [top_left_side, top_right_side, bottom_side]
         self.board_edges = self._GetBoardEdges(n)
@@ -226,7 +227,7 @@ class Board:
         elif (color == Board.BLACK):
             self.b_points.append(pt)
             self._UpdateSegments(pt, self.b_segments)
-        
+
 
         return True
 
@@ -236,10 +237,10 @@ class Board:
 
         if (self._IsWinner(Board.BLACK)):
             return (True, Board.BLACK)
-        
+
         if (len(self.legal_moves) == 0):
             return (True, Board.EMPTY)
-        
+
         return (False, Board.EMPTY)
 
     def GetValue(self, pt):
@@ -282,7 +283,7 @@ class Board:
                 if (self.board[y][x] in self.Color2Text.keys()):
                     symbol = str(self.Color2Text[self.board[y][x]])
                 values += symbol + " "
-            
+
             # Create the spacers to help center the values on the board
             # (This is because the board is triangular).
             spacers = spacer * (length - (y + 1))
@@ -293,20 +294,20 @@ class Board:
             #output += line_number + padding + (spacers + values.strip() + spacers) + "\n"
             #output w/o line number
             output += padding + (spacers + values.strip() + spacers) + "\n"
-        
+
         return output.rstrip()
 
     def Clone(self):
         b = Board(self.size)
-        
+
         b.size = self.size
-        
+
         b.board = copy.deepcopy(self.board)
-        
+
         b.board_edges = copy.deepcopy(self.board_edges)
-        
+
         b.legal_moves = copy.deepcopy(self.legal_moves)
-        
+
         b.w_points = copy.deepcopy(self.w_points)
         b.b_points = copy.deepcopy(self.b_points)
 
@@ -324,23 +325,23 @@ class Board:
 
         # Select the segment list that corresponds to the color
         # If the color is not valid (not BLACK nor WHITE), then return False
-        if (color == Board.WHITE): 
+        if (color == Board.WHITE):
             c_segments = self.w_segments
-        elif (color == Board.BLACK): 
+        elif (color == Board.BLACK):
             c_segments = self.b_segments
-        else: 
+        else:
             return False
-        
-        # If any segment within the segment list 
+
+        # If any segment within the segment list
         # is considered a 'winning' segment, then return True
         for segment in c_segments:
             if (self._IsSegmentWin(segment)):
                 return True
 
         return False
-    
+
     def _IsSegmentWin(self, segment):
-        # If the segment doesn't have a common point with ANY board_edge, 
+        # If the segment doesn't have a common point with ANY board_edge,
         # Then immediately return False. (Segment must touch all edges to be True)
         for board_edge in self.board_edges:
             if len(segment & board_edge) == 0:
@@ -380,12 +381,12 @@ class Board:
             if len(pts_of_interest & cur_segment) > 0:
                 segments_to_remove.append(i)
                 new_segment = new_segment | cur_segment
-        
+
         # Remove the unneeded segments
         segments_to_remove.reverse()
         for i in segments_to_remove:
             pt_segments.pop(i)
-        
+
         # Add the new segment into pt_segments
         pt_segments.append(new_segment)
 
@@ -395,35 +396,47 @@ class Board:
 def TestBoardClass():
     b = Board(11)
     a = agent.Agent(b.WHITE)
-    
+
     print(b)
     print()
     print(str(a.FirstTurn(b)))
     a.PrintLists()
-    
+
     w_player = agent.Agent(b.WHITE)
+    #b_player = player.Player(b.BLACK)
+    #b_player = agent.Agent(b.BLACK)
 
+    w_move = w_player.FirstTurn(b)
 
+    print("first turn is {}".format(w_move))
+    b.ColorPoint(w_move,b.WHITE)
 
-    turn = w_player.FirstTurn(b)
-    print("first turn is {}".format(turn))
-    b.ColorPoint(turn,b.WHITE)
+    #b_move = b_player.PlayMove(b)
+    #b_move = b_player.FirstTurn(b)
+    #b.ColorPoint(b_move,b.BLACK)
 
-    while(turn != None):
-        b.ColorPoint(turn, b.WHITE)
-        turn = w_player.PlayTurn(b)
+    while(w_move != None):
+    #count = 0
+    #while (count < 2):
+        w_move = w_player.PlayTurn(b)
+        b.ColorPoint(w_move, b.WHITE)
+        #count += 1
+    #    b_move = player.RandPlayerUtils.PlayMove(b_player, b)
+    #    b_move = b_player.PlayTurn(b)
+    #    b.ColorPoint(b_move, b.BLACK)
+        #count += 1
 
     print("this is what we played")
     print(b)
 
-        
+
 
     """
-    pts = [(0, 1), (1, 1), (1, 3), (2, 3)] 
+    pts = [(0, 1), (1, 1), (1, 3), (2, 3)]
     color = b.WHITE
     for p in pts:
         b.ColorPoint(p, color)
-    
+
     print(b)
     # segments = b.GetSegments(color)
     segments = b.w_segments
@@ -436,10 +449,10 @@ def TestBoardClass():
 
     new_pts = [(1, 2)]
     # new_pts = [(0, 3), (3, 3)]
-    for p in new_pts:    
+    for p in new_pts:
         new_b.ColorPoint(p, color)
 
-    
+
     print(b)
     print("vs")
     print(new_b)
@@ -452,18 +465,18 @@ def TestBoardClass():
     for s in segments:
         print(s)
     print()
-    
+
    # outcome = new_b.DetectGameEnd()
 
     text = ""
-    if (outcome[0]): text = "Game End" 
+    if (outcome[0]): text = "Game End"
     else: text = "Game Ongoing"
     print("{} {}".format(text, Board.Color2Text[outcome[1]]))
 
     outcome = b.DetectGameEnd()
 
     text = ""
-    if (outcome[0]): text = "Game End" 
+    if (outcome[0]): text = "Game End"
     else: text = "Game Ongoing"
     print("{} {}".format(text, Board.Color2Text[outcome[1]]))
     """
