@@ -71,8 +71,10 @@ class AStar:
 
                     if (board.GetValue(neighbor) == color):
                         neighbor_node.f = cur_node.f
-                    else:
+                    elif (board.GetValue(neighbor) == board.EMPTY):
                         neighbor_node.f = cur_node.f + 1
+                    else:
+                        neighbor_node.f = float("inf")
 
                     neighbor_node.parent = cur_node
 
@@ -93,7 +95,7 @@ class AStar:
             path.append(current)
             current = current.parent
         
-        print("Path: {}".format(path))
+        #print("Path: {}".format(path))
         return path
 
 

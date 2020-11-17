@@ -395,38 +395,44 @@ class Board:
 
 def TestBoardClass():
     b = Board(11)
-    a = agent.Agent(b.WHITE)
 
     print(b)
     print()
-    print(str(a.FirstTurn(b)))
-    a.PrintLists()
 
     w_player = agent.Agent(b.WHITE)
-    #b_player = player.Player(b.BLACK)
-    #b_player = agent.Agent(b.BLACK)
+    b_player = agent.Agent(b.BLACK)
 
     w_move = w_player.FirstTurn(b)
-
-    print("first turn is {}".format(w_move))
+    print("{} played {}".format(b.WHITE, w_move))
     b.ColorPoint(w_move,b.WHITE)
 
-    #b_move = b_player.PlayMove(b)
-    #b_move = b_player.FirstTurn(b)
-    #b.ColorPoint(b_move,b.BLACK)
+
+    b_move = b_player.FirstTurn(b)
+    print("{} played {}".format(b.BLACK, b_move))
+    b.ColorPoint(b_move,b.BLACK)
+
+    print(b)
+    print("")
+
+    w_player.PrintLists()
+    b_player.PrintLists()
 
     while(w_move != None):
     #count = 0
     #while (count < 2):
         w_move = w_player.PlayTurn(b)
         b.ColorPoint(w_move, b.WHITE)
+        print("{} played {}".format(b.WHITE, w_move))
         #count += 1
     #    b_move = player.RandPlayerUtils.PlayMove(b_player, b)
-    #    b_move = b_player.PlayTurn(b)
-    #    b.ColorPoint(b_move, b.BLACK)
+        b_move = b_player.PlayTurn(b)
+        b.ColorPoint(b_move, b.BLACK)
+        print("{} played {}".format(b.BLACK, b_move))
+        print("")
+        print(b)
         #count += 1
 
-    print("this is what we played")
+    print("this is the result")
     print(b)
 
 
