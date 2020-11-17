@@ -92,10 +92,11 @@ class AStar:
         path = []
         current = lastnode
         while (current.parent != None):
-            path.append(current)
+            path.append(current.pt)
             current = current.parent
         
         #print("Path: {}".format(path))
+        
         return path
 
 

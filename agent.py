@@ -46,13 +46,61 @@ class Agent:
 
         pairs = []
         moves = []
+        
+        print(len(path))
+        if(len(path) == 0):
+            return moves, pairs
+        if(len(path) == 1):
+            moves.append(path[0])
+            return moves, pairs
 
+        index = len(path) - 2
+    
+        common = [value for value in board.GetNeighbors(path[index]) if value in edge]
 
-        index = len(path) - 1
+        if(len(common) == 2):
+            pairs.append(common)
+            path[index + 1] = None
+        
+
+        if(index > 1):
+            index = index - 2
+        elif(index == 1):
+            index = index - 1
+        else:
+            moves.append(path[index])
+            return moves, pairs
+
+        while(index > 0):
+            common = self.GetCommonNbrsBetweenPts(board, path[index], path[index + 2])
+            if(common == 2):
+                pairs.append(common)
+                path[index + 1] = None
+                index = index - 2
+            else:
+                index = index - 1
+        
+        common = self.GetCommonNbrsBetweenPts(board, path[index+1], self.start)
+        if(common == 2):
+            pairs.append(common)
+            path[index] = None
+        
+        for move in path:
+            if(move != None):
+                moves.append(move)
+                
+
+        return moves, pairs
+        
+
+            
         #print("this is our starting index: {}".format(index))
         #print("our current path is {}".format(path))
 
         # get all the pairs
+        
+
+        """
         while(index > 1):
             if (board.GetValue(path[index].pt) == self.color):
                 index = index - 1
@@ -97,8 +145,8 @@ class Agent:
 
             print(board_clone)
             print()
-
-        return moves, pairs
+        """
+        
 
 
     def RdmStart(self, board):
@@ -109,9 +157,9 @@ class Agent:
     def FirstTurn(self, board):
         path_finder = AStar.AStar(board)
 
-        #self.start = self.PickStart(board)
+        self.start = self.PickStart(board)
         
-        self.start = self.RdmStart(board)
+        #self.start = self.RdmStart(board)
 
         edges = board.board_edges
 
