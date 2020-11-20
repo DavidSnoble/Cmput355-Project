@@ -44,139 +44,60 @@ class Agent:
 
 
     def SeperatePathToCriticalMovesAndPairs(self, current, path, edge, board):
+        print("recieved path {}".format(path))
         pairs = []
         critical_moves = path
 
-        if (len(path) <= 1): return critical_moves, pairs
+        #if the path is only 1 or 0 moves, return what we have
+        #TODO check if a pair exists between our one move and the start
+        if (len(path) <= 1): 
+            print("small path {}, returning".format(path))
+            return critical_moves, pairs
 
-        index = len(path) - 2
+        index = 1
+        print("path: {} length {}".format(path, len(path)))
+        #if the path is not currently in the goal
+        print("checking goal and {} at index {}".format(path[index], index))
+        if (path[index] not in edge):
+            #check common neighbors between 2nd last move and goal
+            common = [value for value in board.GetNeighbors(path[index]) if value in edge]
+            print("common neighbors of {} and goal are {}".format(path[index], common))
+            #if 2 goals exist, set them as a pair, remove the goal from critical moves, and decrement the index
+            if (len(common) == 2):
+                pairs.append(common)
+                critical_moves.remove(path[0])
+                if (len(path) == 2):
+                    index = len(path) - 1
+                index = index + 2
+            else:
+                index = index + 1
+
 
         ### Removes "Pair Points" within path so that the critical moves remain ###
-        while (index > 0):
+        print("index before the main loop is {}".format(index))
+        while (index < len(path) - 1):
+            print("path is size {}, current index = {}".format(len(path) - 1, index))
             # For every point, get the common points between that and the one 2 spaces ahead
-            common = self.GetCommonNbrsBetweenPts(board, path[index], path[index+2])
+            common = self.GetCommonNbrsBetweenPts(board, path[index], path[index-2])
 
             # If there 2 common points, then that means they are a 'pair'
             #   We remove the critical point between the current point and the one 2 spaces ahead
             #   Append the pair of points from common
             if (common == 2):
                 pairs.append(common)
-                critical_moves.remove(path[index + 1])
+                critical_moves.remove(path[index - 1])
                 if (index < 2): break
-                index = index - 2
+                index = index + 2
             else:
-                index = index - 1
+                index = index + 1
 
-        common = self.GetCommonNbrsBetweenPts(board, path[1], self.start)
+        common = self.GetCommonNbrsBetweenPts(board, path[len(path) - 2], self.start)
         if(common == 2):
             pairs.append(common)
-            path[index] = None
+            critical_moves.remove(path[len(path) - 1])
 
+        print("full search finished, returning {} and {}".format(critical_moves, pairs))
         return critical_moves, pairs
-
-
-    def MovesFromPath(self, current, path, edge, board):
-
-        pairs = []
-        moves = []
-        
-        if(len(path) == 0):
-            return moves, pairs
-        if(len(path) == 1):
-            moves.append(path[0])
-            return moves, pairs
-
-        index = len(path) - 2
-    
-        common = [value for value in board.GetNeighbors(path[index]) if value in edge]
-
-        if(len(common) == 2):
-            pairs.append(common)
-            path[index + 1] = None
-        
-
-        if(index > 1):
-            index = index - 2
-        elif(index == 1):
-            index = index - 1
-        else:
-            moves.append(path[index])
-            return moves, pairs
-
-        while(index > 0):
-            common = self.GetCommonNbrsBetweenPts(board, path[index], path[index + 2])
-            if(common == 2):
-                pairs.append(common)
-                path[index + 1] = None
-                index = index - 2
-            else:
-                index = index - 1
-        
-        common = self.GetCommonNbrsBetweenPts(board, path[index+1], self.start)
-        if(common == 2):
-            pairs.append(common)
-            path[index] = None
-        
-        for move in path:
-            if(move != None):
-                moves.append(move)
-
-        return moves, pairs
-        
-
-            
-        #print("this is our starting index: {}".format(index))
-        #print("our current path is {}".format(path))
-
-        # get all the pairs
-        
-
-        """
-        while(index > 1):
-            if (board.GetValue(path[index].pt) == self.color):
-                index = index - 1
-                continue
-
-            common_neighbors = self.GetCommonNbrsBetweenPts(board, path[index].pt, path[index - 2].pt)
-            #print("index {} and index {}'s common neighbours={}".format(index, index - 1, common_neighbors))
-            #pairs.append(common_neighbors)
-            if (len(common_neighbors) == 2):
-                pairs.append(common_neighbors)
-                path.remove(path[index])
-                index = index - 1
-            index = index - 1
-
-        index = len(path) - 1
-
-        while(index >= 0):
-            #print("path is {}".format(path[index].pt))
-            #print(board.GetValue(path[index].pt))
-            #print(self.color)
-            #print(board.EMPTY)
-            # if the spot is empty place the move
-            if (board.GetValue(path[index].pt) == board.EMPTY):
-                moves.append(path[index].pt)
-
-            index = index - 1
-
-
-        if False:
-        ### DEBUG FUNCTION ###
-            print("DEBUG STATEMENT: BLACK represents MOVES, and WHITE represents PAIRS")
-            print()
-            board_clone = board.Clone()
-
-            for move_node in moves:
-                pt = move_node.pt
-                board_clone.ColorPoint(pt, Board.BLACK)
-
-            for pair_node in pairs:
-                for pt in pair_node:
-                    board_clone.ColorPoint(pt, Board.WHITE)
-
-            print(board_clone)
-            print()
-        """
         
 
 
@@ -199,9 +120,9 @@ class Agent:
         path_bottom = path_finder.GetAStar(board, self.start, edges[2], self.color)
 
 
-        self.moves_left, self.pairs_left = self.MovesFromPath(self.start, path_left, edges[0], board)
-        self.moves_right, self.pairs_right = self.MovesFromPath(self.start, path_right, edges[1], board)
-        self.moves_bottom, self.pairs_bottom = self.MovesFromPath(self.start, path_bottom, edges[2], board)
+        self.moves_left, self.pairs_left = self.SeperatePathToCriticalMovesAndPairs(self.start, path_left, edges[0], board)
+        self.moves_right, self.pairs_right = self.SeperatePathToCriticalMovesAndPairs(self.start, path_right, edges[1], board)
+        self.moves_bottom, self.pairs_bottom = self.SeperatePathToCriticalMovesAndPairs(self.start, path_bottom, edges[2], board)
 
         return self.start
 
@@ -235,7 +156,7 @@ class Agent:
                 print("{} has been been interrupted! there is an opponent at {}".format(self.color, move))
                 path = path_finder.GetAStar(board, self.start, edges[0], self.color)
                 print("new path is {}".format(path))
-                self.moves_left, self.pairs_left = self.MovesFromPath(self.start, path, edges[0], board)
+                self.moves_left, self.pairs_left = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[0], board)
                 print("")
 
         for move in self.moves_right:
@@ -243,7 +164,7 @@ class Agent:
                 print("{} has been been interrupted! there is an opponent at {}".format(self.color, move))
                 path = path_finder.GetAStar(board, self.start, edges[1], self.color)
                 print("new path is {}".format(path))
-                self.moves_right, self.pairs_right = self.MovesFromPath(self.start, path, edges[1], board)
+                self.moves_right, self.pairs_right = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[1], board)
                 print("")
 
         for move in self.moves_bottom:
@@ -251,7 +172,7 @@ class Agent:
                 print("{} has been been interrupted! there is an opponent at {}".format(self.color, move))
                 path = path_finder.GetAStar(board, self.start, edges[2], self.color)
                 print("new path is {}".format(path))
-                self.moves_bottom, self.pairs_bottom = self.MovesFromPath(self.start, path, edges[2], board)
+                self.moves_bottom, self.pairs_bottom = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[2], board)
                 print("")
 
 
@@ -290,6 +211,16 @@ class Agent:
 
         if len(self.moves_bottom) != 0:
             return self.moves_bottom.pop()
+
+        #all moves empty, start playing pairs
+        if len(self.pairs_left) != 0:
+            return self.pairs_left.pop()[0]
+
+        if len(self.pairs_right) != 0:
+            return self.pairs_right.pop()[0]
+
+        if len(self.pairs_bottom) != 0:
+            return self.pairs_bottom.pop()[0]
     
 
 
