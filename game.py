@@ -2,6 +2,7 @@ import re
 
 from board import Board
 from player import Player
+from agent import Agent
 
 
 class Prompt:
@@ -126,9 +127,9 @@ class Game:
             print("Quitting.")
             return
         elif u_input == 1:
-            self.PlayGame(None, Player(Board.BLACK))
+            self.PlayGame(None, Agent(Board.BLACK))
         elif u_input == 2:
-            self.PlayGame(Player(Board.WHITE), Player(Board.BLACK))
+            self.PlayGame(Agent(Board.WHITE), Agent(Board.BLACK))
         else:
             print("Error, unknown option cannot be caught.")
             return

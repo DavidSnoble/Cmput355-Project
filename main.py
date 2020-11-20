@@ -47,5 +47,5 @@ def StartGame():
 
 # StartGame()
 
-game = Game(4)
+game = Game(11)
 game.Start()

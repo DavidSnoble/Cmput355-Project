@@ -394,7 +394,7 @@ class Board:
 
 
 def TestBoardClass():
-    b = Board(11)
+    b = Board(19)
 
     print(b)
     print()
@@ -407,9 +407,9 @@ def TestBoardClass():
     b.ColorPoint(w_move,b.WHITE)
 
 
-    # b_move = b_player.FirstTurn(b)
-    # print("{} played {}".format(b.BLACK, b_move))
-    # b.ColorPoint(b_move,b.BLACK)
+    b_move = b_player.FirstTurn(b)
+    print("{} played {}".format(b.BLACK, b_move))
+    b.ColorPoint(b_move,b.BLACK)
 
     print(b)
     print("")
@@ -426,8 +426,8 @@ def TestBoardClass():
         #count += 1
     #    b_move = player.RandPlayerUtils.PlayMove(b_player, b)
         
-        print("skipping B's turn!")
-        continue
+        # continue
+        # print("skipping B's turn!")
 
         b_move = b_player.PlayTurn(b)
         b.ColorPoint(b_move, b.BLACK)

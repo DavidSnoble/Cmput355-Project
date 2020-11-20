@@ -2,10 +2,12 @@ from board import *
 import AStar
 #import board
 import random
+import math
 
 class Agent:
     color = "EMPTY"
     start = None
+    moves_played = 0
     moves_left = []
     moves_right = []
     moves_bottom = []
@@ -22,13 +24,13 @@ class Agent:
 
     def PickStart(self, board):
         x = int(board.size / 4)
-        y = int(board.size / 2)
+        y = min(int((board.size + 1) / 2), board.size - 1)
         point = (x,y)
 
         if (board.GetValue(point) == board.EMPTY):
             return point
         else:
-            return (x, y+1)
+            return random.choice(board.GetNeighbors(point))
 
     def GetCommonNbrsBetweenPts(self, board, pt1, pt2):
         pt1_neighbors = set(board.GetNeighbors(pt1))
@@ -44,24 +46,21 @@ class Agent:
 
 
     def SeperatePathToCriticalMovesAndPairs(self, current, path, edge, board):
-        print("recieved path {}".format(path))
         pairs = []
-        critical_moves = path
+        critical_moves = list(path)
 
         #if the path is only 1 or 0 moves, return what we have
         #TODO check if a pair exists between our one move and the start
         if (len(path) <= 1): 
-            print("small path {}, returning".format(path))
             return critical_moves, pairs
 
         index = 1
-        print("path: {} length {}".format(path, len(path)))
         #if the path is not currently in the goal
-        print("checking goal and {} at index {}".format(path[index], index))
+        #print("checking goal and {} at index {}".format(path[index], index))
         if (path[index] not in edge):
             #check common neighbors between 2nd last move and goal
             common = [value for value in board.GetNeighbors(path[index]) if value in edge]
-            print("common neighbors of {} and goal are {}".format(path[index], common))
+            #print("common neighbors of {} and goal are {}".format(path[index], common))
             #if 2 goals exist, set them as a pair, remove the goal from critical moves, and decrement the index
             if (len(common) == 2):
                 pairs.append(common)
@@ -74,34 +73,33 @@ class Agent:
 
 
         ### Removes "Pair Points" within path so that the critical moves remain ###
-        print("index before the main loop is {}".format(index))
-        while (index < len(path) - 1):
-            print("path is size {}, current index = {}".format(len(path) - 1, index))
+        while (index <= len(path) - 1):
             # For every point, get the common points between that and the one 2 spaces ahead
             common = self.GetCommonNbrsBetweenPts(board, path[index], path[index-2])
+            #print("common points between {} and {} are {}".format(path[index], path[index - 2], common))
 
             # If there 2 common points, then that means they are a 'pair'
             #   We remove the critical point between the current point and the one 2 spaces ahead
             #   Append the pair of points from common
-            if (common == 2):
+
+            if (len(common) == 2):
                 pairs.append(common)
                 critical_moves.remove(path[index - 1])
-                if (index < 2): break
+                if (index == len(path) - 1): return critical_moves, pairs
                 index = index + 2
             else:
                 index = index + 1
 
         common = self.GetCommonNbrsBetweenPts(board, path[len(path) - 2], self.start)
-        if(common == 2):
+        if(len(common) == 2):
             pairs.append(common)
             critical_moves.remove(path[len(path) - 1])
 
-        print("full search finished, returning {} and {}".format(critical_moves, pairs))
         return critical_moves, pairs
         
 
 
-    def RdmStart(self, board):
+    def RdmMove(self, board):
         legal_moves = list(board.legal_moves)
         output = random.choice(legal_moves)
         return output
@@ -221,52 +219,16 @@ class Agent:
 
         if len(self.pairs_bottom) != 0:
             return self.pairs_bottom.pop()[0]
-    
 
+        return self.RdmMove(board)
 
-        """
-        if len(self.moves_left) != 0:
-            l = self.moves_left.pop()
-            if board.GetValue(l) == board.EMPTY:
-                return l
-            else:
-                for pair in self.pairs_left:
-                    if board.GetValue(pair[0]) != board.EMPTY:
-                        self.pairs_left.remove(pair)
-                        return pair[1]
-                    elif board.GetValue(pair[1]) != board.EMPTY:
-                        self.pairs_left.remove(pair)
-                        return pair[0]
+    def PlayMove(self, board):
+        move = None
+        if (self.moves_played == 0):
+            move = self.FirstTurn(board)
+        else:
+            move = self.PlayTurn(board)
 
-        if len(self.moves_right) != 0:
-            r = self.moves_right.pop()
-            if board.GetValue(r) == board.EMPTY:
-                return r
-            else:
-                for pair in self.pairs_right:
-                    if board.GetValue(pair[0]) != board.EMPTY:
-                        self.pairs_right.remove(pair)
-                        return pair[1]
-                    elif board.GetValue(pair[1]) != board.EMPTY:
-                        self.pairs_right.remove(pair)
-                        return pair[0]
+        self.moves_played += 1
+        return move
 
-        if len(self.moves_bottom) != 0:
-            btm = self.moves_bottom.pop()
-            if board.GetValue(btm) == board.EMPTY:
-                return btm
-            else:
-                for pair in self.pairs_bottom:
-                    if board.GetValue(pair[0]) != board.EMPTY:
-                        self.pairs_bottom.remove(pair)
-                        return pair[1]
-                    elif board.GetValue(pair[1]) != board.EMPTY:
-                        self.pairs_bottom.remove(pair)
-                        return pair[0]
-
-        #print(len(self.pairs_left))
-        #print(len(self.pairs_right))
-        #print(len(self.pairs_bottom))
-        """
-
-        return None

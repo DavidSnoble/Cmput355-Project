@@ -44,17 +44,14 @@ class AStar:
         visited = []
         seen = []
 
-        #we're using negative G here to reverse the heap 
-        # THIS IS A TUPLE 
-        #Because of the heap we must access the second element of the tuple
-        #heapq.heappush(frontier, (-startnode.GetG(), startnode))
         frontier.put(startnode)
         seen.append(startnode)
         cur_node = startnode
 
-        while (cur_node.pt not in goals):
-            #cur_node = heapq.heappop(frontier)[1]
+        while (cur_node.pt not in goals and frontier.qsize() != 0):
             cur_node = frontier.get()
+            if (cur_node.f == float("inf")):
+                return []
 
             visited.append(cur_node)
 
@@ -77,6 +74,11 @@ class AStar:
                         neighbor_node.f = float("inf")
 
                     neighbor_node.parent = cur_node
+                    neighbor_node.direction = self.GetDirection(cur_node.pt, neighbor_node.pt)
+
+                    if (cur_node.direction == neighbor_node.direction):
+                        neighbor_node.f = neighbor_node.f + 1
+
 
                     seen.append(neighbor_node)
 
@@ -85,6 +87,7 @@ class AStar:
                     frontier.put(neighbor_node)
                     #print("")
                     #print("This is the heap" + str(frontier))
+
 
         return self.GetPath(cur_node)
 
@@ -119,11 +122,29 @@ class AStar:
         #print(closest)
         return dist
 
+    def GetDirection(self, p1, p2) :
+        if (p1[0] == p2[0] - 1):
+            if(p1[1] == p2[1] - 1):
+                return "NW"
+            if(p1[1] == p2[1]):
+                return "W"
+            else:
+                return "SW"
+
+        if (p1[0] == p2[0] + 1):
+            if(p1[1] == p2[1] + 1):
+                return "NE"
+            if(p1[1] == p2[1]):
+                return "E"
+            else:
+                return "SE"
+
 
 class Node:
     def __init__(self, pt):
         self.pt = pt
         self.parent = None
+        self.direction = None
         self.f = 0
         self.h = 0
 
