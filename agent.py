@@ -42,12 +42,44 @@ class Agent:
 
         return common_neighbors
 
+
+    def SeperatePathToCriticalMovesAndPairs(self, current, path, edge, board):
+        pairs = []
+        critical_moves = path
+
+        if (len(path) <= 1): return critical_moves, pairs
+
+        index = len(path) - 2
+
+        ### Removes "Pair Points" within path so that the critical moves remain ###
+        while (index > 0):
+            # For every point, get the common points between that and the one 2 spaces ahead
+            common = self.GetCommonNbrsBetweenPts(board, path[index], path[index+2])
+
+            # If there 2 common points, then that means they are a 'pair'
+            #   We remove the critical point between the current point and the one 2 spaces ahead
+            #   Append the pair of points from common
+            if (common == 2):
+                pairs.append(common)
+                critical_moves.remove(path[index + 1])
+                if (index < 2): break
+                index = index - 2
+            else:
+                index = index - 1
+
+        common = self.GetCommonNbrsBetweenPts(board, path[1], self.start)
+        if(common == 2):
+            pairs.append(common)
+            path[index] = None
+
+        return critical_moves, pairs
+
+
     def MovesFromPath(self, current, path, edge, board):
 
         pairs = []
         moves = []
         
-        print(len(path))
         if(len(path) == 0):
             return moves, pairs
         if(len(path) == 1):
@@ -88,7 +120,6 @@ class Agent:
         for move in path:
             if(move != None):
                 moves.append(move)
-                
 
         return moves, pairs
         
