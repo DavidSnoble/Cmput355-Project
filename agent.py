@@ -8,10 +8,14 @@ class Agent:
     color = "EMPTY"
     start = None
     moves_played = 0
+
+    moves_list = [[],[],[]]
+
     moves_left = []
     moves_right = []
     moves_bottom = []
 
+    pairs_list = [[],[],[]]
     pairs_left = []
     pairs_right = []
     pairs_bottom = []
@@ -112,7 +116,9 @@ class Agent:
         #self.start = self.RdmStart(board)
 
         edges = board.board_edges
+        
 
+      
         path_left = path_finder.GetAStar(board, self.start, edges[0], self.color)
         path_right = path_finder.GetAStar(board, self.start, edges[1], self.color)
         path_bottom = path_finder.GetAStar(board, self.start, edges[2], self.color)
@@ -121,13 +127,34 @@ class Agent:
         self.moves_left, self.pairs_left = self.SeperatePathToCriticalMovesAndPairs(self.start, path_left, edges[0], board)
         self.moves_right, self.pairs_right = self.SeperatePathToCriticalMovesAndPairs(self.start, path_right, edges[1], board)
         self.moves_bottom, self.pairs_bottom = self.SeperatePathToCriticalMovesAndPairs(self.start, path_bottom, edges[2], board)
+        
 
+        return self.start
+
+        def FirstTurnNew(self, board):
+            path_finder = AStar.AStar(board)
+
+            self.start = self.PickStart(board)
+            
+            #self.start = self.RdmStart(board)
+
+            edges = board.board_edges
+            
+
+            for x in range(3):
+                path = path_finder.GetAStar(board, self.start, edges[x], self.color)
+                self.moves_list[x], self.pairs_list[x] = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[x], board)
+                print("This is self.moves_list[{}]: {}".format(x, self.moves_list[x]))
+                print("This is self.pairs_list[{}]: {}".format(x, self.pairs_list[x]))
+                input()
+            self.PrintLists()
+        
         return self.start
 
 
 
     def PrintLists(self):
-        #this is for debugging/ getting info
+        """#this is for debugging/ getting info
         print("for {}".format(self.color))
         print("moves lists: (left, right, bottom")
         print(self.moves_left)
@@ -139,15 +166,51 @@ class Agent:
         print(self.pairs_right)
         print(self.pairs_bottom)
         print("")
+        """
+        for x in range(len(self.moves_list)):
+            print("Moves and pairs list {}".format(x))
+            print(self.moves_list[x])
+            print(self.pairs_list[x])
 
+    def PlayTurnNew(self, board):
+        path_finder = AStar.AStar(board)
+        edges = board.board_edges
 
+        for x in range(3):
+            moves = self.moves_list[x]
+            for move in moves:
+                if board.GetValue(move) != board.EMPTY:
+                    self.PrintLists()
+                    print("{} has been been interrupted! there is an opponent at {}".format(self.color, move))
+                    path = path_finder.GetAStar(board, self.start, edges[x], self.color)
+                    print("new path is {}".format(path))
+                    self.moves_list[x], self.pairs_list[x] = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[x], board)
+                    print("")
+        for x in range(3):
+            pairs = self.pairs_list[x]
+            for pair in pairs:
+                if board.GetValue(pair[0]) != board.EMPTY:
+                    pairs.remove(pair)
+                    return pair[1]
+                elif board.GetValue(pair[1]) != board.EMPTY:
+                    pairs.remove(pair)
+                    return pair[0]
+        for moves in self.moves_list:
+            if len(moves) != 0:
+                return moves.pop()
+        
+        for pairs in self.pairs_list:
+            if len(pairs) != 0:
+                return pairs.pop()[0]
+
+        return self.RdmMove(board)
 
     def PlayTurn(self, board):
 
         path_finder = AStar.AStar(board)
         edges = board.board_edges
 
-
+        
         #check that opponent has not interrupted our move lists
         for move in self.moves_left:
             if board.GetValue(move) != board.EMPTY:
@@ -172,7 +235,6 @@ class Agent:
                 print("new path is {}".format(path))
                 self.moves_bottom, self.pairs_bottom = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[2], board)
                 print("")
-
 
         #check that opponent has not played in our pairs
         for pair in self.pairs_left:
@@ -199,7 +261,6 @@ class Agent:
                 self.pairs_bottom.remove(pair)
                 return pair[0]
 
-
         #all cases checked, return from move list
         if len(self.moves_left) != 0:
             return self.moves_left.pop()
@@ -209,7 +270,7 @@ class Agent:
 
         if len(self.moves_bottom) != 0:
             return self.moves_bottom.pop()
-
+        
         #all moves empty, start playing pairs
         if len(self.pairs_left) != 0:
             return self.pairs_left.pop()[0]
@@ -219,7 +280,7 @@ class Agent:
 
         if len(self.pairs_bottom) != 0:
             return self.pairs_bottom.pop()[0]
-
+  
         return self.RdmMove(board)
 
     def PlayMove(self, board):
