@@ -16,10 +16,6 @@ class AStar:
         for i in range(board.size):
             self.nodes.append([Node((x,i)) for x in range(i + 1)])
         
-        
-    
-                
-
 
 
     def GetAStar(self, board, start, goals, color):
