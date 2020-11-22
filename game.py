@@ -160,16 +160,15 @@ class Game:
             # Select point to be played
             point_to_play = None
             if (cur_player is not None):
-                cur_player.PrintLists()
                 point_to_play = cur_player.PlayMove(self.board)
             else:
                 point_to_play = Prompt.PromptAndPlayMove(self.board, player_to_move, moves)
 
-            #TEMPORARY DEBUG STATEMENT - REMOVE LATER
-            if (moves == 20):
-                print("20 moves reched")
-                return
-            #END OF DEBUG STATEMENT
+            # #TEMPORARY DEBUG STATEMENT - REMOVE LATER
+            # if (moves == 20):
+            #     print("20 moves reched")
+            #     return
+            # #END OF DEBUG STATEMENT
             
             # Color the point on the board
             self.board.ColorPoint(point_to_play, color)
