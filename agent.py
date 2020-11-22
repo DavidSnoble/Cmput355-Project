@@ -99,6 +99,8 @@ class Agent:
             pairs.append(common)
             critical_moves.remove(path[len(path) - 1])
 
+        print("given path:{}".format(path))
+        print("giving critical moves:{} and pairs:{}".format(critical_moves, pairs))
         return critical_moves, pairs
         
 
@@ -131,23 +133,22 @@ class Agent:
 
         return self.start
 
-        def FirstTurnNew(self, board):
-            path_finder = AStar.AStar(board)
+    def FirstTurnNew(self, board):
+        path_finder = AStar.AStar(board)
 
-            self.start = self.PickStart(board)
-            
-            #self.start = self.RdmStart(board)
+        self.start = self.PickStart(board)
+        
+        #self.start = self.RdmStart(board)
 
-            edges = board.board_edges
-            
+        edges = board.board_edges
+        
 
-            for x in range(3):
-                path = path_finder.GetAStar(board, self.start, edges[x], self.color)
-                self.moves_list[x], self.pairs_list[x] = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[x], board)
-                print("This is self.moves_list[{}]: {}".format(x, self.moves_list[x]))
-                print("This is self.pairs_list[{}]: {}".format(x, self.pairs_list[x]))
-                input()
-            self.PrintLists()
+        for x in range(3):
+            path = path_finder.GetAStar(board, self.start, edges[x], self.color)
+            print("first turn, getting lists for index {}".format(x))
+            self.moves_list[x], self.pairs_list[x] = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[x], board)
+            path = None
+        self.PrintLists()
         
         return self.start
 
@@ -167,18 +168,23 @@ class Agent:
         print(self.pairs_bottom)
         print("")
         """
+        print("start point is :{}".format(self.start))
         for x in range(len(self.moves_list)):
             print("Moves and pairs list {}".format(x))
             print(self.moves_list[x])
             print(self.pairs_list[x])
+            print("")
+        input()
 
     def PlayTurnNew(self, board):
         path_finder = AStar.AStar(board)
         edges = board.board_edges
 
+        #first check if we have been interrupted in our moves
         for x in range(3):
             moves = self.moves_list[x]
             for move in moves:
+                print("checking our move {}, value is {}".format(move, board.GetValue(move)))
                 if board.GetValue(move) != board.EMPTY:
                     self.PrintLists()
                     print("{} has been been interrupted! there is an opponent at {}".format(self.color, move))
@@ -186,23 +192,35 @@ class Agent:
                     print("new path is {}".format(path))
                     self.moves_list[x], self.pairs_list[x] = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[x], board)
                     print("")
+
+        #then check if any of our pairs have been filled
         for x in range(3):
             pairs = self.pairs_list[x]
             for pair in pairs:
                 if board.GetValue(pair[0]) != board.EMPTY:
+                    print("playing our pair")
                     pairs.remove(pair)
                     return pair[1]
                 elif board.GetValue(pair[1]) != board.EMPTY:
+                    print("playing our pair")
                     pairs.remove(pair)
                     return pair[0]
+
+
+        #play from move list
         for moves in self.moves_list:
             if len(moves) != 0:
+                print("giving move from moves")
                 return moves.pop()
-        
+
+        #if move list is empty, play from pairs
         for pairs in self.pairs_list:
             if len(pairs) != 0:
+                print("Giving move from pairs")
                 return pairs.pop()[0]
 
+        #if we still don't have anything for some reason, something is wrong, however, we can return a random move
+        print("Giving random move")
         return self.RdmMove(board)
 
     def PlayTurn(self, board):
@@ -286,9 +304,9 @@ class Agent:
     def PlayMove(self, board):
         move = None
         if (self.moves_played == 0):
-            move = self.FirstTurn(board)
+            move = self.FirstTurnNew(board)
         else:
-            move = self.PlayTurn(board)
+            move = self.PlayTurnNew(board)
 
         self.moves_played += 1
         return move
