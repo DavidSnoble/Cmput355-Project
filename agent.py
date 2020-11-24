@@ -105,8 +105,6 @@ class Agent:
             pairs.append(common)
             critical_moves.remove(path[len(path) - 1])
 
-        print("given path:{}".format(path))
-        print("giving critical moves:{} and pairs:{}".format(critical_moves, pairs))
         return critical_moves, pairs
         
 
@@ -128,7 +126,6 @@ class Agent:
 
         for x in range(3):
             path = path_finder.GetAStar(board, self.start, edges[x], self.color)
-            print("first turn, getting lists for index {}".format(x))
             self.moves_list[x], self.pairs_list[x] = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[x], board)
             path = None
         self.PrintLists()
@@ -138,12 +135,14 @@ class Agent:
 
 
     def PrintLists(self):
+        '''
         print("start point is :{}".format(self.start))
         for x in range(len(self.moves_list)):
             print("Moves and pairs list {}".format(x))
             print(self.moves_list[x])
             print(self.pairs_list[x])
             print("")
+        '''
 
     def PlayTurn(self, board):
         path_finder = AStar.AStar(board)
@@ -153,12 +152,9 @@ class Agent:
         for x in range(3):
             moves = self.moves_list[x]
             for move in moves:
-                print("checking our move {}, value is {}".format(move, board.GetValue(move)))
                 if board.GetValue(move) != board.EMPTY:
                     self.PrintLists()
-                    print("{} has been been interrupted! there is an opponent at {}".format(self.color, move))
                     path = path_finder.GetAStar(board, self.start, edges[x], self.color)
-                    print("new path is {}".format(path))
                     self.moves_list[x], self.pairs_list[x] = self.SeperatePathToCriticalMovesAndPairs(self.start, path, edges[x], board)
                     print("")
 
@@ -167,11 +163,9 @@ class Agent:
             pairs = self.pairs_list[x]
             for pair in pairs:
                 if board.GetValue(pair[0]) != board.EMPTY:
-                    print("playing our pair")
                     pairs.remove(pair)
                     return pair[1]
                 elif board.GetValue(pair[1]) != board.EMPTY:
-                    print("playing our pair")
                     pairs.remove(pair)
                     return pair[0]
 
@@ -179,17 +173,14 @@ class Agent:
         #play from move list
         for moves in self.moves_list:
             if len(moves) != 0:
-                print("giving move from moves")
                 return moves.pop()
 
         #if move list is empty, play from pairs
         for pairs in self.pairs_list:
             if len(pairs) != 0:
-                print("Giving move from pairs")
                 return pairs.pop()[0]
 
         #if we still don't have anything for some reason, something is wrong, however, we can return a random move
-        print("Giving random move")
         return self.RdmMove(board)
 
     def PlayMove(self, board):

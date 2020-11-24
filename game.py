@@ -3,6 +3,7 @@ import re
 from board import Board
 from player import Player
 from agent import Agent
+import time
 
 
 class Prompt:
@@ -129,7 +130,7 @@ class Game:
         elif u_input == 1:
             self.PlayGame(None, Agent(Board.BLACK))
         elif u_input == 2:
-            self.PlayGame(Agent(Board.WHITE), Agent(Board.BLACK))
+            self.PlayGame(Agent(Board.WHITE), Player(Board.BLACK))
         else:
             print("Error, unknown option cannot be caught.")
             return
@@ -146,6 +147,7 @@ class Game:
         outcome = (False, 0)
 
         while outcome[0] == False:
+            time.sleep(1)
             color = player_color[moves % 2]
             player_to_move = Board.Color2Text[color]
 
